@@ -1,11 +1,11 @@
 /*
- * Exemplo original da palestra "Projeto Babylon: Rodando Java na GPU" — JavaDay.
+ * Example written for the talk "Projeto Babylon: Rodando Java na GPU" (JavaDay).
  *
- * Fractal de Julia animado em uma janela: cada thread da GPU calcula a COR
- * de um pixel (1,44 milhão de threads por frame). O kernel é Java puro —
- * o HAT traduz o code model para CUDA C em runtime.
+ * An animated Julia fractal in a window: each GPU thread computes the color
+ * of one pixel (1.44 million threads per frame). The kernel is plain Java;
+ * HAT translates its code model to CUDA C at run time.
  *
- * Rodar: ./run.sh (veja o README)
+ * Run it with ./run.sh (see the README).
  */
 import hat.Accelerator;
 import hat.Accelerator.Compute;
@@ -28,7 +28,7 @@ public class JavaDayGpu {
 
     static final int W = 1600, H = 900, MAX_ITER = 1000;
 
-    // ---- roda na GPU: uma thread por pixel, devolve a cor ARGB ------------
+    // ---- runs on the GPU: one thread per pixel, returns the ARGB color ----
     @Reflect
     public static void juliaKernel(S32Array out, int w, int h, float cr, float ci) {
         if (GIX() < w * h) {
@@ -43,9 +43,9 @@ public class JavaDayGpu {
                 zr = t;
                 iter = iter + 1;
             }
-            int color = 0xFF000000;                       // interior: preto
+            int color = 0xFF000000;                       // interior: black
             if (iter < MAX_ITER) {
-                float v = iter * 0.055f;                  // coloração cíclica suave
+                float v = iter * 0.055f;                  // smooth cyclic coloring
                 int r = (int) (127.5f * (1.0f - (float) Math.cos(v)));
                 int g = (int) (127.5f * (1.0f - (float) Math.cos(v * 0.7f + 1.2f)));
                 int b = (int) (127.5f * (1.0f - (float) Math.cos(v * 0.4f + 2.4f)));
@@ -60,7 +60,7 @@ public class JavaDayGpu {
         cc.dispatchKernel(NDRange.of1D(w * h), () -> juliaKernel(out, w, h, cr, ci));
     }
 
-    // ---- roda na JVM: janela + loop de animação ---------------------------
+    // ---- runs on the JVM: window and animation loop -----------------------
     static void main() {
         var accelerator = new Accelerator(MethodHandles.lookup(), Backend.FIRST);
         var out = S32Array.create(accelerator, W * H);
@@ -77,7 +77,7 @@ public class JavaDayGpu {
                 g.drawString(hud, 16, getHeight() - 18);
             }
         };
-        var frame = new JFrame("JavaDay ▸ Java na GPU ▸ Projeto Babylon + HAT");
+        var frame = new JFrame("JavaDay ▸ Java on the GPU ▸ Project Babylon + HAT");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(view);
         frame.setSize(W, H);
@@ -95,7 +95,7 @@ public class JavaDayGpu {
 
             for (int i = 0; i < pixels.length; i++) pixels[i] = out.array(i);
 
-            view.hud = String.format("%,d threads/frame na GPU  ▸  kernel %.1f ms  ▸  c = %.3f%+.3fi  ▸  frame %d",
+            view.hud = String.format("%,d threads/frame on the GPU  ▸  kernel %.1f ms  ▸  c = %.3f%+.3fi  ▸  frame %d",
                     W * H, gpuMs, cr, ci, f);
             view.repaint();
             try { Thread.sleep(10); } catch (InterruptedException e) { return; }

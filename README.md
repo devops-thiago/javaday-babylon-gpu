@@ -1,5 +1,7 @@
 # Java on the GPU with Project Babylon
 
+![One frame of the Julia fractal, rendered by 1,440,000 GPU threads in 4.4 ms](javaday-julia.png)
+
 This repository contains one small example: an animated Julia fractal where
 every pixel is computed by a GPU thread. The GPU kernel is written in plain
 Java. There is no JNI code and no CUDA C in this project.
