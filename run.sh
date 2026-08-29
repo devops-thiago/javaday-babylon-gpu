@@ -13,7 +13,10 @@ if [ ! -x "$JDK/bin/java" ]; then
   exit 1
 fi
 
-export PATH=$JDK/bin:/usr/local/cuda/bin:$PATH
+export PATH=$JDK/bin:$PATH
+# HAT calls nvcc at run time. Add the CUDA toolkit to the PATH only if nvcc
+# is not already there, so a wrapper earlier in the PATH keeps working.
+command -v nvcc >/dev/null || export PATH=$PATH:/usr/local/cuda/bin
 # On WSL the CUDA driver library lives here:
 [ -d /usr/lib/wsl/lib ] && export LD_LIBRARY_PATH=/usr/lib/wsl/lib
 
