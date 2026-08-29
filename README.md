@@ -12,8 +12,8 @@ translates it to CUDA C, compiles it with `nvcc`, and runs it on the GPU.
 
 The whole example is one file, [JavaDayGpu.java](JavaDayGpu.java). The kernel
 is about 25 lines. When you run it, a window opens with an animated fractal.
-The window title bar shows how many threads ran on the GPU and how long each
-frame took. On an RTX 5060 Ti, one frame (1,440,000 threads, up to 1,000
+A status line at the bottom of the window shows how many threads ran on the
+GPU and how long each frame took. On an RTX 5060 Ti, one frame (1,440,000 threads, up to 1,000
 iterations each) takes a few milliseconds.
 
 This example was written for the talk "Projeto Babylon: Rodando Java na GPU"
@@ -112,12 +112,12 @@ multi-threaded Java backend in the classpath:
 -cp build/hat-core-1.0.jar:build/hat-optkl-1.0.jar:build/hat-wrap-shared-1.0.jar:build/hat-backend-java-mt-1.0.jar
 ```
 
-It is much slower, but it proves the point: the backend is a plug, the code
-does not change.
+It is much slower, but the Java code stays the same.
 
 ## Troubleshooting
 
-**nvcc fails with "exception specification is incompatible" for `rsqrt`.**
+### nvcc fails with "exception specification is incompatible" for rsqrt
+
 This happens on distributions with glibc 2.41 or newer (Ubuntu 25.10+,
 Fedora 42+). glibc now declares `rsqrt` with `noexcept`, and the CUDA 13
 headers declare it without. Until NVIDIA fixes the header, you can patch
@@ -127,13 +127,16 @@ directory and put a small `nvcc` wrapper first in your `PATH`. Remember
 that HAT calls `nvcc` at run time, so the wrapper has to be on the `PATH`
 of the Java process too.
 
-**The window never appears on WSL2.** Check that other GUI apps work. If
-nothing shows up and WSL has been running for days, run `wsl --shutdown`
-from PowerShell and open a new terminal. That restarts WSLg.
+### The window never appears on WSL2
 
-**`Module jdk.incubator.code not found`.** You are running a normal JDK,
-not the one you built from the Babylon repository. Check which `java` is
-first in your `PATH`.
+Check that other GUI apps work. If nothing shows up and WSL has been
+running for days, run `wsl --shutdown` from PowerShell and open a new
+terminal. That restarts WSLg.
+
+### Module jdk.incubator.code not found
+
+You are running a normal JDK, not the one you built from the Babylon
+repository. Check which `java` is first in your `PATH`.
 
 ## License
 
